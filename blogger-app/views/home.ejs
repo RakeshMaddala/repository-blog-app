@@ -17,15 +17,15 @@
 			<div class="col-sm-3 sidenav">
 			  <h4>Blog Application</h4>
 			  <ul class="nav nav-pills nav-stacked">
-				<li class="active"><a href="#section2">All Blogs({{allBlogCount}})</a></li>
-				<li><a href="#section3">Politics({{politicsCount}})</a></li>
-				<li><a href="#section4">Economics({{economicsCount}})</a></li>
-				<li><a href="#section5">Agriculture({{agriCount}})</a></li>
-				<li><a href="#section6">Pharmaceuticals({{pharmaCount}})</a></li>
+				<li class="active"><a href="" ng-click="filterBlogs('All',$event)">All Blogs({{allBlogCount}})</a></li>
+				<li><a href="" ng-click="filterBlogs('Politics',$event)">Politics({{politicsCount}})</a></li>
+				<li><a href="" ng-click="filterBlogs('Economics',$event)">Economics({{economicsCount}})</a></li>
+				<li><a href="" ng-click="filterBlogs('Agriculture',$event)">Agriculture({{agriCount}})</a></li>
+				<li><a href="" ng-click="filterBlogs('Pharmaceuticals',$event)">Pharmaceuticals({{pharmaCount}})</a></li>
 			  </ul><br>
 			  <div class="input-group">
 				<span class="input-group-btn">
-				  <button class="btn btn-default" type="button">
+				  <button class="btn btn-default" type="button" data-toggle="modal" data-target="#CreateBlogModal">
 					Create Blog
 				  </button>
 				</span>
@@ -33,20 +33,37 @@
 			</div>
 			
 			<div class="col-sm-9">
-			  <h4><small>RECENT POSTS</small></h4>
 			  <div ng-repeat="post in posts">
 				  <hr>
 				  <h2>{{post.title}}</h2>
 				  <h5><span class="label label-danger">{{post.category}}</span></h5><br>
 				  <p contenteditable="false">{{post.postContent}}</p>
 				  <br>
-				  <button ng-show="true" class="btn btn-default" type="button" ng-click="makeBlogEditable($event)">
+				  <button ng-show="!post.editmode" class="btn btn-default" type="button" ng-click="makeBlogEditable($event,$index)">
 					Edit Blog
 				  </button>
-				  <button ng-show="false" class="btn btn-default" type="button" ng-click="submitBlogChanges($event)">
+				  <button ng-show="post.editmode" class="btn btn-default" type="button" ng-click="submitBlogChanges($event,$index)">
 					Submit Blog
 				  </button>
 				  <br>
+			  </div>
+			</div>
+			
+			<div id="CreateBlogModal" class="modal fade" role="dialog">
+			  <div class="modal-dialog">
+				<div class="modal-content">
+				  <div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Create New Blog</h4>
+				  </div>
+				  <div class="modal-body">
+					<p>Some text in the modal.</p>
+				  </div>
+				  <div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Submit</button>
+				  </div>
+				</div>
+
 			  </div>
 			</div>
 		</div>

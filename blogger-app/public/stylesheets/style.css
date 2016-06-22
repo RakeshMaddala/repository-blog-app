@@ -31,3 +31,7 @@ footer {
   }
   .row.content {height: auto;}
 }
+
+.hand-pointer {
+	cursor: pointer;
+}
