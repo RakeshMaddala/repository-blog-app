@@ -1,46 +1,33 @@
-var loremIpsumTitle = "Lorem Ipsum Title";
-var loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
-
 var myBlogApplication = angular.module("blog-app",[]) ;
 
-myBlogApplication.controller('MainBlogCtrl', ['$scope',function($scope){
+myBlogApplication.service("blogsservice", function($http) {
+		this.processBlogs = function() {
+			
+		}
+});
+
+myBlogApplication.controller('MainBlogCtrl', function($http,$scope,blogsservice){
   $scope.title = 'Blog Application!';
-  $scope.posts =    [
-					  {title: loremIpsumTitle, category: 'Politics', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Agriculture', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Economics', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Pharmaceuticals', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Agriculture', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Politics', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Agriculture', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Economics', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Pharmaceuticals', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Agriculture', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Politics', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Agriculture', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Economics', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Pharmaceuticals', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Agriculture', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Politics', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Agriculture', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Economics', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Pharmaceuticals', postContent: loremIpsum, editmode: false},
-					  {title: loremIpsumTitle, category: 'Agriculture', postContent: loremIpsum, editmode: false}
-					];
-  $scope.tempPosts = $scope.posts ;
-  $scope.allBlogCount = $scope.posts.length;
-  $scope.politicsCount = $scope.posts.filter(function(el){
-						      return el.category === "Politics"
-						 }).length ; 
-  $scope.economicsCount = $scope.posts.filter(function(el){
-						      return el.category === "Economics"
-						 }).length  ;
-  $scope.agriCount =  $scope.posts.filter(function(el){
-						      return el.category === "Agriculture"
-						 }).length  ;
-  $scope.pharmaCount = $scope.posts.filter(function(el){
-						      return el.category === "Pharmaceuticals"
-						 }).length  ;
+  $scope.successPostsHandler = function(response){
+	  $scope.posts = response.data ;
+	  $scope.tempPosts = $scope.posts ;
+	  $scope.allBlogCount = $scope.posts.length;
+	  $scope.politicsCount = $scope.posts.filter(function(el){
+								  return el.category === "Politics"
+							 }).length ; 
+	  $scope.economicsCount = $scope.posts.filter(function(el){
+								  return el.category === "Economics"
+							 }).length  ;
+	  $scope.agriCount =  $scope.posts.filter(function(el){
+								  return el.category === "Agriculture"
+							 }).length  ;
+	  $scope.pharmaCount = $scope.posts.filter(function(el){
+								  return el.category === "Pharmaceuticals"
+							 }).length  ;
+  };
+  $http.get("/getAllBlogPosts").then($scope.successPostsHandler, function(response) {
+			console.log("Error retrieving contacts.");
+			});
   
   $scope.makeBlogEditable = function(currEvent,postIndex){
 	$scope.posts[postIndex].editmode = true;
@@ -73,4 +60,4 @@ myBlogApplication.controller('MainBlogCtrl', ['$scope',function($scope){
 	  $scope.posts.push({title: 'A new post!', category: 'Politics', postContent: loremIpsum});
   };
   
-}]);
+});

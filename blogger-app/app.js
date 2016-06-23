@@ -21,7 +21,37 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Setting up Mongo db connections and BLOG Database CRUDS
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
+var ObjectId = require('mongodb').ObjectID;
+var mongodbUrl = 'mongodb://mcwane:mcwane@ds021694.mlab.com:21694/mcwane-blogs';
+var mongoDb ;
+
+MongoClient.connect(mongodbUrl, (err, database) => {
+  if (err) return console.log(err)
+  mongoDb = database ;
+})
+
+var insertBlogDocument = function(db,blog,callback) {
+   db.collection('blogs').insertOne( blog , function(err, result) {
+    assert.equal(err, null);
+    console.log("Inserted a document into the blogs collection.");
+    callback();
+  });
+};
+
 app.get('/', blog.home);
+
+app.get("/getAllBlogPosts", function(req, res) {
+  mongoDb.collection("blogs").find({}).toArray(function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get contacts.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -53,6 +83,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;
