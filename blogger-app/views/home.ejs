@@ -37,13 +37,16 @@
 				  <hr>
 				  <h2>{{post.title}}</h2>
 				  <h5><span class="label label-danger">{{post.category}}</span></h5><br>
-				  <p contenteditable="false">{{post.postContent}}</p>
+				  <p id="{{post._id}}" data-category="{{post.category}}" data-title="{{post.title}}" contenteditable="false">{{post.postContent}}</p>
 				  <br>
-				  <button ng-show="!post.editmode" class="btn btn-default" type="button" ng-click="makeBlogEditable($event,$index)">
+				  <button data-mongoid="{{post._id}}" ng-show="!post.editmode" class="btn btn-default" type="button" ng-click="makeBlogEditable($event,$index)">
 					Edit Blog
 				  </button>
-				  <button ng-show="post.editmode" class="btn btn-default" type="button" ng-click="submitBlogChanges($event,$index)">
+				  <button data-mongoid="{{post._id}}" ng-show="post.editmode" class="btn btn-default" type="button" ng-click="submitBlogChanges($event,$index)">
 					Submit Blog
+				  </button>
+				  <button data-mongoid="{{post._id}}" ng-show="true" class="btn btn-default" type="button" ng-click="deleteBlog($event,$index)">
+					Delete Blog
 				  </button>
 				  <br>
 			  </div>
@@ -57,10 +60,28 @@
 					<h4 class="modal-title">Create New Blog</h4>
 				  </div>
 				  <div class="modal-body">
-					<p>Some text in the modal.</p>
+					<form id="BlogCreationForm" target="_blank" accept-charset="UTF-8"
+								enctype="application/x-www-form-urlencoded" autocomplete="off" novalidate>
+						<div class="form-group">
+							<input type="text" class="form-control" id="BlogTitle">
+						</div>
+						<div class="form-group">
+						  <label for="BlogContent">Your Blog Content Here:</label>
+						  <textarea class="form-control" rows="10" id="BlogContent"></textarea>
+						</div>
+						<div class="form-group">
+						  <label for="BlogCategory">Select Category:</label>
+						  <select class="form-control" id="BlogCategory">
+							<option>Agriculture</option>
+							<option>Politics</option>
+							<option>Pharmaceuticals</option>
+							<option>Economics</option>
+						  </select>
+						</div>
+					</form>
 				  </div>
 				  <div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Submit</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal" ng-click="createBlogPost()">Create Blog</button>
 				  </div>
 				</div>
 

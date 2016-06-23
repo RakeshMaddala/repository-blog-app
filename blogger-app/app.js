@@ -13,8 +13,6 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -23,8 +21,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Setting up Mongo db connections and BLOG Database CRUDS
 var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
 var ObjectId = require('mongodb').ObjectID;
+var assert = require('assert');
 var mongodbUrl = 'mongodb://mcwane:mcwane@ds021694.mlab.com:21694/mcwane-blogs';
 var mongoDb ;
 
@@ -33,25 +31,55 @@ MongoClient.connect(mongodbUrl, (err, database) => {
   mongoDb = database ;
 })
 
-var insertBlogDocument = function(db,blog,callback) {
-   db.collection('blogs').insertOne( blog , function(err, result) {
-    assert.equal(err, null);
-    console.log("Inserted a document into the blogs collection.");
-    callback();
-  });
-};
-
 app.get('/', blog.home);
 
-app.get("/getAllBlogPosts", function(req, res) {
+/* REST CRUD operation for key:value pair table */
+// Read rest api
+app.get("/blogs", function(req, res) {
   mongoDb.collection("blogs").find({}).toArray(function(err, docs) {
     if (err) {
-      handleError(res, err.message, "Failed to get contacts.");
+      handleError(res, err.message, "Failed to get blogs.");
     } else {
       res.status(200).json(docs);
     }
   });
 });
+// Create rest api
+app.post("/blogs", function(req, res) {
+  var newBlog = req.body;
+  console.log(newBlog);
+  mongoDb.collection("blogs").insertOne(newBlog.message, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to create new blog.");
+    } else {
+      res.status(201).json(doc.ops[0]);
+    }
+  });
+});
+// Update Rest API
+app.put("/blogs/:id", function(req, res) {
+  var updateDoc = req.body;
+  delete updateDoc._id;
+  console.log("Updating the blog, param oid: "+req.params.id)
+  mongoDb.collection("blogs").updateOne({_id: new ObjectId(req.params.id)}, updateDoc, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to update blog");
+    } else {
+      res.status(204).end();
+    }
+  });
+});
+// Delete rest api
+app.delete("/blogs/:id", function(req, res) {
+  mongoDb.collection("blogs").deleteOne({_id: new ObjectId(req.params.id)}, function(err, result) {
+    if (err) {
+      handleError(res, err.message, "Failed to delete blog");
+    } else {
+      res.status(204).end();
+    }
+  });
+});
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

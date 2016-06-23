@@ -25,8 +25,8 @@ myBlogApplication.controller('MainBlogCtrl', function($http,$scope,blogsservice)
 								  return el.category === "Pharmaceuticals"
 							 }).length  ;
   };
-  $http.get("/getAllBlogPosts").then($scope.successPostsHandler, function(response) {
-			console.log("Error retrieving contacts.");
+  $http.get("/blogs").then($scope.successPostsHandler, function(response) {
+			console.log("Error retrieving blogs.");
 			});
   
   $scope.makeBlogEditable = function(currEvent,postIndex){
@@ -35,9 +35,21 @@ myBlogApplication.controller('MainBlogCtrl', function($http,$scope,blogsservice)
 	currEvent.currentTarget.previousElementSibling.previousElementSibling.focus();
   };
   
+  $scope.updatePostsHandler = function(){
+	  
+  };
+  
   $scope.submitBlogChanges = function(currEvent,postIndex){
 	currEvent.currentTarget.previousElementSibling.previousElementSibling.previousElementSibling.setAttribute('contentEditable','false');
+	currBlogId = currEvent.currentTarget.dataset["mongoid"] ;
+	var blogContent = $("#"+currBlogId).text() ;
+	var title = $("#"+currBlogId).attr("data-title") ;
+	var category = $("#"+currBlogId).attr("data-category") ;
+	var modifiedBlog = {'_id':currBlogId,'title':title,'category':category,'postContent':blogContent,'editmode':false}
 	$scope.posts[postIndex].editmode = false;
+	$http.put("/blogs/"+currBlogId,modifiedBlog).then($scope.updatePostsHandler, function(response) {
+			console.log("Error Submitting blog changes.");
+		});
   };
   
   $scope.filterBlogs = function(blogCategory, currEvent){
@@ -52,12 +64,36 @@ myBlogApplication.controller('MainBlogCtrl', function($http,$scope,blogsservice)
 	  $(currEvent.target).parent().addClass("active") ;
   }
   
-  $scope.addPost = function(){
-	  $scope.posts.push({title: 'A new post!', category: 'Politics', postContent: loremIpsum});
+  $scope.createBlogPost = function(){
+	  var newBlogContent = {title: $("#BlogTitle").val(), category: $("#BlogCategory").val(), postContent: $("#BlogContent").val(),'editmode':false}
+	  $scope.posts.push(newBlogContent);
+	  $http({
+			url: '/blogs',
+			method: "POST",
+			data: { 'message' : newBlogContent }
+		})
+		.then(function(response) {
+					
+		});
   };
   
-  $scope.addPostDialog = function(){
-	  $scope.posts.push({title: 'A new post!', category: 'Politics', postContent: loremIpsum});
+  $scope.deleteBlog = function(currEvent,postIndex){
+	  currBlogId = currEvent.currentTarget.dataset["mongoid"] ;
+	  $http.delete("/blogs/"+currBlogId).then($scope.updatePostsHandler, function(response) {
+			console.log("Error deleting blog.");
+		});
+	  for (var i =0; i < $scope.posts.length; i++){
+		   if ($scope.posts[i]._id === currBlogId) {
+			  $scope.posts.splice(i,1);
+			  break;
+		   }
+	  }
+	  for (var i =0; i < $scope.tempPosts.length; i++){
+		   if ($scope.tempPosts[i]._id === currBlogId) {
+			  $scope.tempPosts.splice(i,1);
+			  break;
+		   }
+	  }
   };
   
 });
